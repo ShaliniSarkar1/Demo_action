@@ -42,4 +42,8 @@ jobs:
       - run: |
           docker build . -t shalinitest.azurecr.io/javaimage:${{ github.sha }}
           docker push shalinitest.azurecr.io/javaimage:${{ github.sha }}
-    
+      - uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'shaliniwebapp'
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          images: 'shalinitest.azurecr.io/javaimage:${{ github.sha }}'
