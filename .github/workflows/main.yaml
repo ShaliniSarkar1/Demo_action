@@ -31,4 +31,4 @@ jobs:
       - name: Build docker image
         working-directory: application
         run: |
-          docker build -t shalini/AzureDevops-demo-1.0-SNAPSHOT .
+          docker build -t target/AzureDevops-demo-1.0-SNAPSHOT .
