@@ -28,3 +28,7 @@ jobs:
           name: artifact.jar
           path: application/target/AzureDevops-demo-1.0-SNAPSHOT.jar
 
+      - name: Build docker image
+        working-directory: application
+        run: |
+          docker build -t shalini/AzureDevops-demo-1.0-SNAPSHOT .
