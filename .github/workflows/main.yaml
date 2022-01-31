@@ -28,7 +28,14 @@ jobs:
           name: artifact.jar
           path: application/target/AzureDevops-demo-1.0-SNAPSHOT.jar
 
-      - name: Build docker image
+      - uses: actions/checkout@v2
+      - name: Download Maven build artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: artifact.jar
+          path: application/target
+      - name: Build Docker container
         working-directory: application
         run: |
-          docker build -t target/AzureDevops-demo-1.0-SNAPSHOT .
+          docker build . -t shalinitest/AzureDevops-demo-1.0-SNAPSHOT:${{ github.sha }}
+    
