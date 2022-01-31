@@ -28,14 +28,12 @@ jobs:
           name: artifact.jar
           path: application/target/AzureDevops-demo-1.0-SNAPSHOT.jar
 
-      - uses: actions/checkout@v2
       - name: Download Maven build artifact
         uses: actions/download-artifact@v2
         with:
           name: artifact.jar
           path: application/target
       
-      - uses: actions/checkout@v2
       - uses: azure/docker-login@v1
         with:
           login-server: shalinitest.azurecr.io
