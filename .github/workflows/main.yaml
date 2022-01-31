@@ -7,9 +7,6 @@ jobs:
     name: test the work flow
     runs-on: ubuntu-latest
     steps:
-      - name: Check the workflow
-        run: echo "hello there!"
-        
       - name: checkout the repo
         uses: actions/checkout@v2
 
@@ -20,3 +17,6 @@ jobs:
 
       - name: build the maven project
         run: mvn -B package --file application/pom.xml
+
+      - name: Unit test
+        run: pwd
