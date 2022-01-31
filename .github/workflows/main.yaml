@@ -37,6 +37,6 @@ jobs:
       - name: Build Docker container
         working-directory: application
         run: |
-          docker build . -t shalinitest.azurecr.iot/javaimage:${{ github.sha }}
+          docker build . -t shalinitest.azurecr.io/javaimage:${{ github.sha }}
           docker push shalinitest.azurecr.io/javaimage:${{ github.sha }}
     
