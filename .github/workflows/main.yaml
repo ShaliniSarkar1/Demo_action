@@ -34,15 +34,14 @@ jobs:
         with:
           name: artifact.jar
           path: application/target
-      - name: Build Docker container
-        working-directory: application
-        uses: actions/checkout@v2
-        uses: azure/docker-login@v1
+      
+      - uses: actions/checkout@v2
+      - uses: azure/docker-login@v1
         with:
           login-server: shalinitest.azurecr.io
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
-        run: |
+      - run: |
           docker build . -t shalinitest.azurecr.io/javaimage:${{ github.sha }}
           docker push shalinitest.azurecr.io/javaimage:${{ github.sha }}
     
