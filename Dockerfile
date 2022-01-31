@@ -3,6 +3,7 @@ RUN mkdir -p /workspace
 WORKDIR /workspace
 COPY application/pom.xml /workspace
 COPY application/src /workspace/src
+RUN pwd && ls -l
 RUN mvn -B package --file application/pom.xml -DskipTests
 
 FROM openjdk:11-jdk-slim
