@@ -9,6 +9,9 @@ jobs:
     steps:
       - name: Check the workflow
         run: echo "hello there!"
+        
+      - name: checkout the repo
+        uses: actions/checkout@v2
 
       - name: Set up JDK
         uses: actions/setup-java@v1
