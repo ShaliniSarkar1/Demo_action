@@ -16,7 +16,4 @@ jobs:
           java-version: 1.8
 
       - name: build the maven project
-        run: mvn -B package --file /application/pom.xml
-
-      - name: just a look at directory
-        run: ls -a
+        run: mvn -B package --file pom.xml
