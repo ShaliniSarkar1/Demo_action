@@ -19,4 +19,11 @@ jobs:
         run: mvn -B package --file application/pom.xml
 
       - name: Unit test
-        run: pwd
+        working-directory: application
+        run: mvn -B verify
+
+      - name: Upload Maven build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifact.jar
+          path: application/target/AzureDevops-demo-1.0-SNAPSHOT.jar
