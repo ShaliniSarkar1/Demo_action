@@ -35,7 +35,7 @@ jobs:
           name: artifact.jar
           path: application/target
       - name: Build Docker container
-        uses: Azure/docker-login@v1
+        uses: azure/docker-login@v1
         working-directory: application
         run: |
           docker build . -t shalinitest.azurecr.io/javaimage:${{ github.sha }}
