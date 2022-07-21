@@ -42,4 +42,45 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve
         
+  creating-namespace:
+    needs: ["terraform"]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: /home/runner/work/Demo_action/Demo_action/namespace
+    steps:
+      - name: checkout the repo
+        uses: actions/checkout@v2
+
+      - name: Azure login
+        uses: azure/login@v1.4.0
+        with:
+          creds: '{ "clientId": "${{ secrets.SP_CLIENT_ID }}", "clientSecret": "${{ secrets.SP_PASSWORD }}", "subscriptionId": "${{ secrets.SUBSCRIPTION_ID }}", "tenantId": "${{ secrets.SP_TENANT_ID }}"}'
+      - name: Downloading kubeconfig
+        run: |
+          az aks -n cluster28 -g container-rg -f - >> kubeconfig
+          sudo az aks install-cli
+          export KUBECONFIG=$(pwd)/kubeconfig
+          kubelogin convert-kubeconfig -l spn
+          export AAD_SERVICE_PRINCIPAL_CLIENT_ID=${{ secrets.SP_CLIENT_ID }}
+          export AAD_SERVICE_PRINCIPAL_CLIENT_SECRET=${{ secrets.SP_PASSWORD }}
+          kubectl config current context
+          echo "AAD_SERVICE_PRINCIPAL_CLIENT_ID=${{ secrets.SP_CLIENT_ID }}" >> $GITHUB_ENV
+          echo "AAD_SERVICE_PRINCIPAL_CLIENT_SECRET=${{ secrets.SP_PASSWORD }}" >> $GITHUB_ENV
+          echo "KUBE_CONFIG_PATH="$(pwd)/kubeconfig" >> $GITHUB_ENV
+          echo "KUBECONFIG="$(pwd)/kubeconfig" >> $GITHUB_ENV
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
         
+      - name: Terraform Init
+        run: terraform init
+        
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan
+        
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+          
+
