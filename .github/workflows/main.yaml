@@ -50,7 +50,7 @@ jobs:
         working-directory: /home/runner/work/Demo_action/Demo_action/namespace
     steps:
       - name: checkout the repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Azure login
         uses: azure/login@v1.4.0
@@ -67,8 +67,8 @@ jobs:
           kubectl config current-context
           echo "AAD_SERVICE_PRINCIPAL_CLIENT_ID=${{ secrets.SP_CLIENT_ID }}" >> $GITHUB_ENV
           echo "AAD_SERVICE_PRINCIPAL_CLIENT_SECRET=${{ secrets.SP_PASSWORD }}" >> $GITHUB_ENV
-          echo "KUBE_CONFIG_PATH="$(pwd)/kubeconfig" >> $GITHUB_ENV
-          echo "KUBECONFIG="$(pwd)/kubeconfig" >> $GITHUB_ENV
+          echo "KUBE_CONFIG_PATH=$(pwd)/kubeconfig" >> $GITHUB_ENV
+          echo "KUBECONFIG=$(pwd)/kubeconfig" >> $GITHUB_ENV
       
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
