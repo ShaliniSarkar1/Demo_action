@@ -147,15 +147,15 @@ jobs:
         with:
           keyvault: "container-key-vault28"
           secrets: 'adminUsername, adminPassword, loginServer'
-        id: acrcreds
+        id: acrcred
       - uses: azure/k8s-create-secret@v1
         with:
-          container-registry-url: ${{ steps.acrcreds.outputs.loginServer }}
-          container-registry-username: ${{ steps.acrcreds.outputs.adminUsername }}
-          container-registry-password: ${{ steps.acrcreds.outputs.adminPassword }}
+          container-registry-url: ${{ steps.acrcred.outputs.loginServer }}
+          container-registry-username: ${{ steps.acrcred.outputs.adminUsername }}
+          container-registry-password: ${{ steps.acrcred.outputs.adminPassword }}
           secret-name: "img-pull-secret"
           namespace: "ns28"
           arguments: --force true
       - name: Deploy helm
         run: |
-          helm install sample-app . -n ns28 --set image=${{ steps.acrcreds.outputs.loginServer }}/mypackage:${{ github.sha }}
+          helm install sample-app . -n ns28 --set image=${{ steps.acrcred.outputs.loginServer }}/mypackage:${{ github.sha }}
