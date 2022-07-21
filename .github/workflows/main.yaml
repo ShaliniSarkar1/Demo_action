@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Azure login
-        uses: azure/login@v1
+        uses: azure/login@v1.4.0
         with:
           creds: '{ "clientId": "${{ secrets.SP_CLIENT_ID }}", "clientSecret": "${{ secrets.SP_PASSWORD }}", "subscriptionId": "${{ secrets.SUBSCRIPTION_ID }}", "tenantId": "${{ secrets.SP_TENANT_ID }}"}'
 
