@@ -48,19 +48,6 @@ resource "azurerm_kubernetes_cluster" "default" {
     createdby = "Shalini"
   }
 }
-resource "kubernetes_namespace" "leap-task" {
-  metadata {
-    annotations = {
-      name = var.ns_name
-    }
-
-    labels = {
-      mylabel = "sample-app"
-    }
-
-    name = var.ns_name
-  }
-}
 
 resource "azurerm_container_registry" "acr" {
   name                = var.acr_name
