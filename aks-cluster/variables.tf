@@ -13,6 +13,3 @@ variable "node" {
 variable "acr_name" {
  default = "acr28"
 }
-variable "ns_name" {
- default = "ns28"
-}
