@@ -28,7 +28,7 @@ resource "kubernetes_namespace" "leap-task" {
     }
 
     labels = {
-      mylabel = "sample-app"
+      label = "sample-app"
     }
 
     name = var.ns_name
