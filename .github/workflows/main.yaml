@@ -160,4 +160,3 @@ jobs:
         run: |
           helm install sample-app . -n ns28 --set image=${{ steps.acrcred.outputs.loginServer }}/mypackage:${{ github.sha }}
   
-\
