@@ -1,2 +1,2 @@
-image: acr28.azurecr.io/image:v1
-replica: 4
+image: acr28.azurecr.io/mypackage:v1
+replica: 2
