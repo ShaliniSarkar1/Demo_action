@@ -58,7 +58,7 @@ resource "azurerm_container_registry" "acr" {
 }
 
 data "azurerm_key_vault" "keyvault" {
-  name = var.keyvault_name
+  name = "container-key-vault28"
   resource_group_name = "container-rg"
 }
 resource "azurerm_key_vault_secret" "acr-usrname" {
