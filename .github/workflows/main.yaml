@@ -1,49 +1,45 @@
 name: Actions-Workflow
 
-on: push
+env:
+  ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ secrets.SP_TENANT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.SP_PASSWORD }}
+  ARM_CLIENT_ID: ${{ secrets.SP_CLIENT_ID }}
+
+on:
+  push:
+    branches:
+      - tech-stack
+    paths:
+      - '.github/workflows/main.yaml'
 
 jobs:
-  test:
-    name: test the work flow
+  terraform:
+    name: terraform setup
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: /home/runner/work/Demo_action/Demo_action/aks-cluster
     steps:
       - name: checkout the repo
         uses: actions/checkout@v2
 
-      - name: Set up JDK
-        uses: actions/setup-java@v1
+      - name: Azure login
+        uses: azure/login@v1
         with:
-          java-version: 1.8
+          creds: '{ "clientId": "${{ secrets.SP_CLIENT_ID }}", "clientSecret": "${{ secrets.SP_PASSWORD }}", "subscriptionId": "${{ secrets.SUBSCRIPTION_ID }}", "tenantId": "${{ secrets.SP_TENANT_ID }}"}'
 
-      - name: build the maven project
-        run: mvn -B package --file application/pom.xml
-
-      - name: Unit test
-        working-directory: application
-        run: mvn -B verify
-
-      - name: Upload Maven build artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: artifact.jar
-          path: application/target/AzureDevops-demo-1.0-SNAPSHOT.jar
-
-      - name: Download Maven build artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: artifact.jar
-          path: application/target
-      
-      - uses: azure/docker-login@v1
-        with:
-          login-server: shalinitest.azurecr.io
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
-      - run: |
-          docker build . -t shalinitest.azurecr.io/javaimage:${{ github.sha }}
-          docker push shalinitest.azurecr.io/javaimage:${{ github.sha }}
-      - uses: azure/webapps-deploy@v2
-        with:
-          app-name: 'shaliniwebapp'
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          images: 'shalinitest.azurecr.io/javaimage:${{ github.sha }}'
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        
+      - name: Terraform Init
+        id: init
+        
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan
+        
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        
+        
