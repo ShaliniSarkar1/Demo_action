@@ -14,7 +14,7 @@ terraform {
     resource_group_name = "container-rg"
     storage_account_name = "containerstorage28"
     container_name = "tfstate"
-    key = "leap.tfstate"
+    key = "ns.tfstate"
   }
 }
 
