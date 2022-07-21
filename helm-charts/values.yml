@@ -1,0 +1,2 @@
+image: acr28.azurecr.io/image:v1
+replica: 4
