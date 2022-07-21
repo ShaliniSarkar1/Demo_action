@@ -56,3 +56,25 @@ resource "azurerm_container_registry" "acr" {
   sku                 = "Premium"
   admin_enabled       = true
 }
+
+data "azurerm_key_vault" "keyvault" {
+  name = var.keyvault_name
+  resource_group_name = "container-rg"
+}
+resource "azurerm_key_vault_secret" "acr-usrname" {
+  name         = "adminUsername"
+  value        = azurerm_container_registry.acr.admin_username
+  key_vault_id = data.azurerm_key_vault.keyvault.id
+}
+
+resource "azurerm_key_vault_secret" "acr-url" {
+  name         = "loginServer"
+  value        = azurerm_container_registry.acr.login_server
+  key_vault_id = data.azurerm_key_vault.keyvault.id
+}
+
+resource "azurerm_key_vault_secret" "acr-password" {
+  name         = "adminPassword"
+  value        = azurerm_container_registry.acr.admin_password
+  key_vault_id = data.azurerm_key_vault.keyvault.id
+}
