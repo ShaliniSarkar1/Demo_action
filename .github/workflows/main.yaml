@@ -58,7 +58,7 @@ jobs:
           creds: '{ "clientId": "${{ secrets.SP_CLIENT_ID }}", "clientSecret": "${{ secrets.SP_PASSWORD }}", "subscriptionId": "${{ secrets.SUBSCRIPTION_ID }}", "tenantId": "${{ secrets.SP_TENANT_ID }}"}'
       - name: Downloading kubeconfig
         run: |
-          az aks -n cluster28 -g container-rg -f - >> kubeconfig
+          az aks get-credentials -n cluster28 -g container-rg -f - >> kubeconfig
           sudo az aks install-cli
           export KUBECONFIG=$(pwd)/kubeconfig
           kubelogin convert-kubeconfig -l spn
