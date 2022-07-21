@@ -82,4 +82,81 @@ jobs:
         
       - name: Terraform Apply
         run: terraform apply -auto-approve
+        
+  Docker-building:
+    needs: ["terraform","creating-namespace"]
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout the repo
+        uses: actions/checkout@v3
+
+      - name: Azure login
+        uses: azure/login@v1.4.0
+        with:
+          creds: '{ "clientId": "${{ secrets.SP_CLIENT_ID }}", "clientSecret": "${{ secrets.SP_PASSWORD }}", "subscriptionId": "${{ secrets.SUBSCRIPTION_ID }}", "tenantId": "${{ secrets.SP_TENANT_ID }}"}'
+      - name: Keyvault secret
+        uses: Azure/get-keyvault-secrets@v1
+        with:
+          keyvault: "container-key-vault28"
+          secrets: 'adminUsername, adminPassword, loginServer'
+        id: acrcreds
+      - name: ACR Login
+        uses: Azure/docker-login@v1
+        with:
+          username: ${{ steps.acrcreds.outputs.adminUsername }}
+          password: ${{ steps.acrcreds.outputs.adminPassword }}
+          login-server: ${{ steps.acrcreds.outputs.loginServer }}
+      - name: Docker Build and Push
+        run: | 
+         docker build . -t ${{ steps.acrcreds.outputs.loginServer }}/mavenpackage:${{ github.sha }}
+         docker push ${{ steps.acrcreds.outputs.loginServer }}/mavenpackage:${{ github.sha }}
+  helm-commands:
+    needs: ["Docker-building"]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: /home/runner/work/Demo_action/Demo_action/helm-charts
+    steps:
+      - name: checkout the repo
+        uses: actions/checkout@v3
+
+      - name: Azure login
+        uses: azure/login@v1.4.0
+        with:
+          creds: '{ "clientId": "${{ secrets.SP_CLIENT_ID }}", "clientSecret": "${{ secrets.SP_PASSWORD }}", "subscriptionId": "${{ secrets.SUBSCRIPTION_ID }}", "tenantId": "${{ secrets.SP_TENANT_ID }}"}'
+      - name: Downloading kubeconfig
+        run: |
+          az aks get-credentials -n cluster28 -g container-rg -f - >> kubeconfig
+          sudo az aks install-cli
+          export KUBECONFIG=$(pwd)/kubeconfig
+          kubelogin convert-kubeconfig -l spn
+          export AAD_SERVICE_PRINCIPAL_CLIENT_ID=${{ secrets.SP_CLIENT_ID }}
+          export AAD_SERVICE_PRINCIPAL_CLIENT_SECRET=${{ secrets.SP_PASSWORD }}
+          kubectl config current-context
+          echo "AAD_SERVICE_PRINCIPAL_CLIENT_ID=${{ secrets.SP_CLIENT_ID }}" >> $GITHUB_ENV
+          echo "AAD_SERVICE_PRINCIPAL_CLIENT_SECRET=${{ secrets.SP_PASSWORD }}" >> $GITHUB_ENV
+          echo "KUBE_CONFIG_PATH=$(pwd)/kubeconfig" >> $GITHUB_ENV
+          echo "KUBECONFIG=$(pwd)/kubeconfig" >> $GITHUB_ENV
           
+      - name: Helm Installation
+        uses: Azure/setup-helm@v1
+        with:
+          version: v3.3.1
+      - name: Keyvault secret
+        uses: Azure/get-keyvault-secrets@v1
+        with:
+          keyvault: "container-key-vault28"
+          secrets: 'adminUsername, adminPassword, loginServer'
+        id: acrcreds
+      - uses: azure/k8s-create-secret@v1
+        with:
+          container-registry-url: ${{ steps.acrcred.outputs.loginServer }}
+          container-registry-username: ${{ steps.acrcred.outputs.adminUsername }}
+          container-registry-password: ${{ steps.acrcred.outputs.adminPassword }}
+          secret-name: "img-pull-secret"
+          namespace: "ns28"
+          arguments: --force true
+      - name: Deploy helm
+        run: |
+          helm install sample-app . -n ns28 --set image=${{ steps.acrcred.outputs.loginServer }}/mavenpackage:${{ github.sha }}
+  
